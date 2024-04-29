@@ -6,9 +6,11 @@ const DB_URL=process.env.DB_URL
 const app = express()
 app.use(express.json())
 
-const userroutes = require('./routes/userroutes')
+const userRoutes = require('./routes/userroutes')
+const adminRoutes =require('./routes/adminroutes')
 
-app.use('/user',userroutes)
+app.use('/user',userRoutes)
+app.use('/admin',adminRoutes)
 
 
 

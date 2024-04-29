@@ -13,11 +13,16 @@ const userSchema = mongoose.Schema({
         type:String,
         required:true        
     },
-    PhoneNumber:{
+    phoneNumber:{
         type:Number,
         required:true
     },
-    Isadmin:{
+    isAdmin:{
+        type:Boolean,
+        required:true,
+        default:false
+    },
+    blockStatus:{
         type:Boolean,
         required:true,
         default:false

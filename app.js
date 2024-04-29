@@ -8,6 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const userRoutes = require('./routes/userroutes')
+const adminRoutes =require('./routes/adminroutes')
+
+app.use('/user',userRoutes)
+app.use('/admin',adminRoutes)
+
 const userroutes = require("./routes/userroutes");
 
 app.use("/user", userroutes);

@@ -1,4 +1,5 @@
 const users = require('../models/userlogin')
+const shops = require ('../models/shops')
 const emails = require('../utils/emails')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -51,4 +52,41 @@ const addUser= async (req, res) =>{
         }
 }
 
-module.exports ={addUser}
+const addShop= async (req, res) =>{
+    try {
+        const {shopName,location, district} =req.body
+        const existingShop = await shops.findOne({
+            $and: [
+              { shopName: shopName },
+              { location: location },
+              { district: district }
+            ]
+          });
+
+          if (existingShop) {
+            res.json({
+                success:false,
+                message:'shop is already exist'
+            })
+          } else {
+            const newShop = new shops({
+                shopName,
+                location,
+                district
+            })
+            await newShop.save()
+            res.json({
+                success:true,
+                message:'shop added successfully'
+            })
+          }
+    }
+    catch(error){
+        res.json({
+            success:false,
+            message:'shop adding failed'
+        })
+    }
+}
+
+module.exports ={addUser, addShop}

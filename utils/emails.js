@@ -26,6 +26,7 @@ const sendEmail = async (email, subjectSend,username, userpass) => {
     In this email, you'll find your login credentials:
 
     - Employee Username: ${username}
+    - Employee email: ${email}
     - Password: ${userpass}
 
     Welcome aboard!
@@ -39,6 +40,7 @@ const sendEmail = async (email, subjectSend,username, userpass) => {
 
     <ul>
       <li><span style="color: #336699;">Employee username:</span> <strong>${username}</strong></li>
+      <li><span style="color: #336699;">Employee email:</span> <strong>${email}</strong></li>
       <li><span style="color: #336699;">Password:</span> <strong> ${userpass} </strong></li>
     </ul>
     <p>Welcome aboard!</p>

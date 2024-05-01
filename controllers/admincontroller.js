@@ -1,10 +1,11 @@
 const users = require('../models/userlogin')
 const emails = require('../utils/emails')
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const addUser= async (req, res) =>{
         try {
             const {username , email, phoneNumber} = req.body
-            console.log(req.body);
             const existingUser= await users.findOne({email})
             if (existingUser) {
                 res.json({
@@ -13,21 +14,26 @@ const addUser= async (req, res) =>{
                 })
             } else {
                 const password = username.substring(0, 4).toUpperCase()+ phoneNumber.toString().substring(0, 4)
-       
+                const lowercaseusername= username.toLowerCase()
                 emails(
                     email,
                     `ADMIN VERIFICATION EMAIL`,
-                    username,
+                    lowercaseusername,
                     password
-                ).then((res)=>{
+                ).then(async ()=>{
                     console.log('suucessfully mail sended');
-                        // const newUser = new users({
-                        //     username,
-                        //     email,
-                        //     phoneNumber,
-                        //     password
-                        // })
-                        // await newUser.save()
+                        const bcryptpassword= await bcrypt.hash(password, 10)
+                        const newUser = new users({
+                            username:lowercaseusername,
+                            email,
+                            phoneNumber,
+                            password:bcryptpassword
+                        })
+                        await newUser.save()
+                        res.json({
+                            success:true,
+                            message:'user added successfully',
+                        })
                 })
                 .catch(err=>{
                     console.log(`errr ${err}`);
@@ -35,12 +41,6 @@ const addUser= async (req, res) =>{
                         message: 'email send failed'
                     })
                 })
-
-                res.json({
-                    success:true,
-                    message:'user added successfully',
-                })
-
             }
         }
         catch (err) {
@@ -50,4 +50,5 @@ const addUser= async (req, res) =>{
             })
         }
 }
+
 module.exports ={addUser}

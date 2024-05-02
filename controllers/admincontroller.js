@@ -122,4 +122,32 @@ const blockAndUnblockUser = async (req, res) => {
   }
 };
 
-module.exports = { addUser, showUser, blockAndUnblockUser, addShop };
+const ShowShops = async (req, res) => {
+  try {
+    const allShops = await shops.find();
+    res.json({allShops});
+  } catch (error) {
+    console.error('Error fetching shops with delete status false:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const deleteAndUndoShops = async (req, res) => {
+  try {
+    const { shopId } = req.body;
+    const shop = await shops.findById(shopId);
+    if (!shop) {
+      return res.status(404).json({ error: 'Shop not found' });
+    }
+    shop.deleteStatus = !shop.deleteStatus;
+    await shop.save();
+    res.json({ message: 'Delete status updated successfully' });
+  } catch (error) {
+    console.error('Error updating delete status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+module.exports = { addUser, showUser, blockAndUnblockUser, addShop, ShowShops, deleteAndUndoShops };

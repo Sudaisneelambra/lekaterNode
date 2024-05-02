@@ -5,6 +5,8 @@ router.post('/adduser', admin.addUser)
 router.get('/showUsers', admin.showUser)
 router.patch('/changeStatus', admin.blockAndUnblockUser)
 router.post('/addshop', admin.addShop)
+router.get('/showShops', admin.ShowShops)
+router.patch('/deleteUndoShops', admin.deleteAndUndoShops)
 
 
 

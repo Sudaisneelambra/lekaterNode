@@ -13,6 +13,11 @@ const shopSchema = mongoose.Schema({
         type:String,
         required:true        
     },
+    deleteStatus:{
+        type:Boolean,
+        default:false,
+        required:true,
+    },
 })
 
 module.exports = mongoose.model('shops',shopSchema)

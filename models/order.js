@@ -29,6 +29,10 @@ const orderSchema = mongoose.Schema({
         type:Date,
         required:true,
     },
+    orderRecivedBy:{
+        type:String,
+        required:true,
+    },
     cancelStatus:{
         type:Boolean,
         required:true,
@@ -39,6 +43,17 @@ const orderSchema = mongoose.Schema({
         required:true,
         default:false
     },
+    editstatus:{
+        type:Boolean,
+        required:true,
+        default:false
+    },
+    editedperson:{
+        type:String,
+        required:true,
+        default:''
+    },
+
 })
 
 module.exports = mongoose.model('orders',orderSchema)

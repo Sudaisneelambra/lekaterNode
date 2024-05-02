@@ -1,9 +1,8 @@
 const users = require("../models/userlogin");
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
-
-
 const sercretKey= process.env.JWT_SECRETKEY
+
 const userlogin = async (req, res) => {
   try {
     const { password, email } = req.body;
@@ -21,6 +20,7 @@ const userlogin = async (req, res) => {
                     name:mailexist.username,
                     email:mailexist.email,
                     phonenumber:mailexist.phoneNumber,
+                    type:'user'
                     },
                     sercretKey,
                     { expiresIn: '1h' } 
@@ -56,4 +56,12 @@ const userlogin = async (req, res) => {
   }
 };
 
-module.exports = { userlogin };
+const createOrder= async (req, res) =>{
+  try {
+
+  } catch (err) {
+
+  }
+}
+
+module.exports = { userlogin ,createOrder};

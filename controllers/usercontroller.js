@@ -128,4 +128,24 @@ const getOrder= async ( req, res)=>{
   }
 }
 
-module.exports = { userlogin ,createOrder,getShops,getOrder};
+const getAllOrder= async ( req, res)=>{
+  try{
+    const order = await orders.find({ cancelStatus: { $ne: true } });
+    if(order) {
+      res.json({
+        success:true,
+        message:'order getting successfully',
+        data:order
+      })
+    }
+  } 
+  catch(err) {
+    console.log(err);
+    res.status(400).json({
+      success:false,
+      message:'order getting failed'
+    })
+  }
+}
+
+module.exports = { userlogin ,createOrder,getShops,getOrder,getAllOrder};

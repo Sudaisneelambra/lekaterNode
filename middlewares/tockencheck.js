@@ -14,7 +14,6 @@ const checkTocken=(req, res, next)=>{
       if (expirationTime < currentTime) {
         console.log('Authorization header has expired');
       } else {
-        console.log(decoded);
         req.tokens= decoded;
         next();
       }

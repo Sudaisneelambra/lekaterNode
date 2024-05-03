@@ -9,6 +9,8 @@ router.post('/login',users.userlogin)
 router.post('/createOrder',tockencheck,upload.single('imageUrl'),users.createOrder)
 router.get('/getShops',tockencheck,users.getShops)
 router.get('/getOrder',tockencheck,users.getOrder)
+router.get('/getAllOrder',tockencheck,users.getAllOrder)
+
 
 
 

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const shopsModel= require('../models/shops')
 const sercretKey= process.env.JWT_SECRETKEY
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const userlogin = async (req, res) => {
   try {
@@ -172,4 +172,40 @@ const getAllOrder= async ( req, res)=>{
   }
 }
 
-module.exports = { userlogin ,createOrder,getShops,getOrder,getAllOrder};
+const getsingleorderdetails= async(req, res) =>{
+  try{
+    const id= new mongoose.Types.ObjectId(req.params.id)
+    const singleOrderData= await orders.aggregate([
+      {
+        $match:{
+          _id:id
+        }
+      }
+      ,
+      {
+          $lookup:{
+            from:'shops',
+            localField:'shopName',
+            foreignField:'_id',
+            as:'shopdetails'
+          }
+      }
+    ])
+    if(singleOrderData) {
+      res.json({
+        success:true,
+        message:'datafetched successfully',
+        data:singleOrderData
+      })
+    }
+  } 
+  catch(err) {
+    console.log(err);
+    res.status(400).json({
+      success:false,
+      message:'orderdata fetching failed',
+    })
+  }
+}
+
+module.exports = { userlogin ,createOrder,getShops,getOrder,getAllOrder,getsingleorderdetails};

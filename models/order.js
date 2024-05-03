@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const orderSchema = mongoose.Schema({
     shopName:{
-        type: String,
+        type: mongoose.Types.ObjectId,
         required:true
     },
     itemName:{

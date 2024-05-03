@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const shopsModel= require('../models/shops')
 const sercretKey= process.env.JWT_SECRETKEY
+const mongoose = require('mongoose')
 
 const userlogin = async (req, res) => {
   try {
@@ -104,13 +105,22 @@ const getShops= async (req, res)=>{
 
 const getOrder= async ( req, res)=>{
   try{
-    const order = await orders.find({
-      $and: [
-        { cancelStatus: false },
-        { orderDeliveriedStatus: false }
-      ]
-    })
-
+    const order = await orders.aggregate([
+      {
+        $match: {
+          cancelStatus: false,
+          orderDeliveriedStatus: false
+        }
+      },
+      {
+        $lookup: {
+          from: 'shops', 
+          localField: 'shopName', 
+          foreignField: '_id', 
+          as: 'shopdetails' 
+        }
+      }
+    ]);
     if(order) {
       res.json({
         success:true,
@@ -130,7 +140,21 @@ const getOrder= async ( req, res)=>{
 
 const getAllOrder= async ( req, res)=>{
   try{
-    const order = await orders.find({ cancelStatus: { $ne: true } });
+    const order = await orders.aggregate([
+      {
+        $match: {
+          cancelStatus: { $ne: true } 
+        }
+      },
+      {
+        $lookup: {
+          from: 'shops', 
+          localField: 'shopName', 
+          foreignField: '_id', 
+          as: 'shopdetails'
+        }
+      }
+    ]);
     if(order) {
       res.json({
         success:true,

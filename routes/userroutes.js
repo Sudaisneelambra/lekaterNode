@@ -10,7 +10,7 @@ router.post('/createOrder',tockencheck,upload.single('imageUrl'),users.createOrd
 router.get('/getShops',tockencheck,users.getShops)
 router.get('/getOrder',tockencheck,users.getOrder)
 router.get('/getAllOrder',tockencheck,users.getAllOrder)
-
+router.get('/getsingleorderdetails/:id',tockencheck,users.getsingleorderdetails)
 
 
 

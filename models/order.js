@@ -50,9 +50,16 @@ const orderSchema = mongoose.Schema({
     },
     editedperson:{
         type:String,
-        required:true,
-        default:''
+        default:null
     },
+    DeliveredDate:{
+        type:Date,
+        default:null
+    },
+    EditDate:{
+        type:Date,
+        default:null
+    }
 
 })
 

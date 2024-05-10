@@ -127,6 +127,7 @@ const getOrder = async (req, res) => {
           as: "shopdetails",
         },
       },
+      { $limit: 10 } 
     ]);
     if (order) {
       res.json({
@@ -146,6 +147,8 @@ const getOrder = async (req, res) => {
 
 const getAllOrder = async (req, res) => {
   try {
+    const {skip} =req.body
+    const skipvalue =(skip-1)*10
     const order = await orders.aggregate([
       {
         $match: {
@@ -160,6 +163,8 @@ const getAllOrder = async (req, res) => {
           as: "shopdetails",
         },
       },
+      { $skip: skipvalue },
+      { $limit: 10 } 
     ]);
     if (order) {
       res.json({
@@ -443,6 +448,93 @@ const editOrder = async (req, res) => {
   }
 };
 
+const getorderlength = async (req, res) => {
+  try {
+    const condition = { cancelStatus: false };
+    const orderslength = await orders.countDocuments(condition);
+    if (orderslength) {
+      res.json({
+        success: true,
+        message: "order length getted successfully",
+        data:orderslength
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "order length getted failed",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: "order length getting failed",
+    });
+  }
+};
+
+const getsearchallorder= async(req, res) =>{
+  try {
+    const searchValue = req.query.searchValue;
+    const page = req.query.page;
+    const skipvalue =(page-1)*10
+    const ord = await orders.aggregate([
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      {
+        $match: {
+          "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
+        }
+      },
+    ]);
+
+    const orde = await orders.aggregate([
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      {
+        $match: {
+          "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
+        }
+      },
+      { $skip: skipvalue },
+      { $limit: 10 } 
+    ]);
+
+    const length= ord.length
+
+    if(orde) {
+      console.log('anuz');
+      console.log(ord);
+      console.log(orde);
+      res.json({
+        success:true,
+        message:"successfully getted",
+        searchedlength:length,
+        data:orde,
+        loging:'minjaan'
+      })
+    }
+  }
+  catch(err) {
+    res.json({
+      success:false,
+      message:'getting failed'
+    })
+  }
+}
+
 module.exports = {
   userlogin,
   createOrder,
@@ -456,5 +548,7 @@ module.exports = {
   cancelorder,
   allcancelorder,
   orderdetail,
-  editOrder
+  editOrder,
+  getorderlength,
+  getsearchallorder
 };

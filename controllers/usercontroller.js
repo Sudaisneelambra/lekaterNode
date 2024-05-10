@@ -6,6 +6,8 @@ const shopsModel = require("../models/shops");
 const sercretKey = process.env.JWT_SECRETKEY;
 const mongoose = require("mongoose");
 
+
+// user login
 const userlogin = async (req, res) => {
   try {
     const { password, email } = req.body;
@@ -19,7 +21,7 @@ const userlogin = async (req, res) => {
               name: mailexist.username,
               email: mailexist.email,
               phonenumber: mailexist.phoneNumber,
-              type: "user",
+              type: mailexist.isAdmin,
             },
             sercretKey,
             { expiresIn: "1h" }
@@ -55,6 +57,8 @@ const userlogin = async (req, res) => {
   }
 };
 
+
+// create order
 const createOrder = async (req, res) => {
   try {
     const {
@@ -93,6 +97,8 @@ const createOrder = async (req, res) => {
   }
 };
 
+
+// shops getting for dropdown
 const getShops = async (req, res) => {
   try {
     const shops = await shopsModel.find({});
@@ -110,6 +116,8 @@ const getShops = async (req, res) => {
   }
 };
 
+
+// get orders or latest order
 const getOrder = async (req, res) => {
   try {
     const order = await orders.aggregate([
@@ -145,8 +153,12 @@ const getOrder = async (req, res) => {
   }
 };
 
+
+// get all orders 
 const getAllOrder = async (req, res) => {
   try {
+    const condition = { cancelStatus: false };
+    const orderslength = await orders.countDocuments(condition);
     const {skip} =req.body
     const skipvalue =(skip-1)*10
     const order = await orders.aggregate([
@@ -171,6 +183,7 @@ const getAllOrder = async (req, res) => {
         success: true,
         message: "order getting successfully",
         data: order,
+        searchedlength:orderslength
       });
     }
   } catch (err) {
@@ -182,6 +195,8 @@ const getAllOrder = async (req, res) => {
   }
 };
 
+
+// get single orders
 const getsingleorderdetails = async (req, res) => {
   try {
     const id = new mongoose.Types.ObjectId(req.params.id);
@@ -216,14 +231,13 @@ const getsingleorderdetails = async (req, res) => {
   }
 };
 
+
+// orderdelivered status change
 const orderdeliveried = async (req, res) => {
   try {
-    console.log(req.params.id);
     const id = new mongoose.Types.ObjectId(req.params.id);
-    console.log(id);
     const singleOrder = await orders.findOne({ _id: id });
     if (singleOrder) {
-      console.log(singleOrder);
       singleOrder.orderDeliveriedStatus = true;
       singleOrder.DeliveredDate = new Date();
       await singleOrder.save();
@@ -246,8 +260,13 @@ const orderdeliveried = async (req, res) => {
   }
 };
 
+// all deliveried order
 const allDeliveredOrders = async (req, res) => {
   try {
+    const {page} = req.body
+    const skipvalue =(page-1)*10
+    const condition ={orderDeliveriedStatus: true}
+    const orderslength = await orders.countDocuments(condition);
     const order = await orders.aggregate([
       {
         $match: {
@@ -262,12 +281,15 @@ const allDeliveredOrders = async (req, res) => {
           as: "shopdetails",
         },
       },
+      { $skip: skipvalue },
+      { $limit: 10 }
     ]);
     if (order) {
       res.json({
         success: true,
         message: "all delivered order getting successfully",
         data: order,
+        length:orderslength
       });
     }
   } catch (err) {
@@ -279,8 +301,14 @@ const allDeliveredOrders = async (req, res) => {
   }
 };
 
+
+// all pending orders
 const allPendingOrders = async (req, res) => {
   try {
+    const {page} = req.body
+    const skipvalue =(page-1)*10
+    const condition ={orderDeliveriedStatus: false,cancelStatus: false,}
+    const orderslength = await orders.countDocuments(condition);
     const order = await orders.aggregate([
       {
         $match: {
@@ -296,12 +324,15 @@ const allPendingOrders = async (req, res) => {
           as: "shopdetails",
         },
       },
+      { $skip: skipvalue },
+      { $limit: 10 } 
     ]);
     if (order) {
       res.json({
         success: true,
         message: "all pending order getting successfully",
         data: order,
+        length:orderslength
       });
     }
   } catch (err) {
@@ -313,14 +344,13 @@ const allPendingOrders = async (req, res) => {
   }
 };
 
+
+// cancel status changes
 const cancelorder = async (req, res) => {
   try {
-    console.log(req.params.id);
     const id = new mongoose.Types.ObjectId(req.params.id);
-    console.log(id);
     const singleOrder = await orders.findOne({ _id: id });
     if (singleOrder) {
-      console.log(singleOrder);
       singleOrder.cancelStatus = true;
       await singleOrder.save();
       res.json({
@@ -342,6 +372,8 @@ const cancelorder = async (req, res) => {
   }
 };
 
+
+// all cancel order getting
 const allcancelorder = async (req, res) => {
   try {
     const order = await orders.aggregate([
@@ -360,7 +392,6 @@ const allcancelorder = async (req, res) => {
       },
     ]);
     if (order) {
-      console.log(order);
       res.json({
         success: true,
         message: "order cancelation successfully",
@@ -376,11 +407,11 @@ const allcancelorder = async (req, res) => {
   }
 };
 
+
+// order details get
 const orderdetail = async (req, res) => {
   try {
-    console.log(req.params.id);
     const id = new mongoose.Types.ObjectId(req.params.id);
-    console.log(id);
     const singleOrder = await orders.findOne({ _id: id });
     if (singleOrder) {
       res.json({
@@ -403,6 +434,8 @@ const orderdetail = async (req, res) => {
   }
 };
 
+
+// edit order
 const editOrder = async (req, res) => {
   try {
     const {
@@ -448,31 +481,8 @@ const editOrder = async (req, res) => {
   }
 };
 
-const getorderlength = async (req, res) => {
-  try {
-    const condition = { cancelStatus: false };
-    const orderslength = await orders.countDocuments(condition);
-    if (orderslength) {
-      res.json({
-        success: true,
-        message: "order length getted successfully",
-        data:orderslength
-      });
-    } else {
-      res.json({
-        success: false,
-        message: "order length getted failed",
-      });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({
-      success: false,
-      message: "order length getting failed",
-    });
-  }
-};
 
+// get all ordersearch
 const getsearchallorder= async(req, res) =>{
   try {
     const searchValue = req.query.searchValue;
@@ -492,6 +502,9 @@ const getsearchallorder= async(req, res) =>{
           "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
         }
       },
+      {
+        $count: "totalCount"
+      }
     ]);
 
     const orde = await orders.aggregate([
@@ -511,19 +524,144 @@ const getsearchallorder= async(req, res) =>{
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
-
-    const length= ord.length
-
     if(orde) {
-      console.log('anuz');
-      console.log(ord);
-      console.log(orde);
       res.json({
         success:true,
         message:"successfully getted",
-        searchedlength:length,
+        searchedlength:ord[0]?.totalCount,
         data:orde,
-        loging:'minjaan'
+      })
+    }
+  }
+  catch(err) {
+    res.json({
+      success:false,
+      message:'getting failed'
+    })
+  }
+}
+
+// get all pending orders search
+const getsearchpendingorder= async(req, res) =>{
+  try {
+    const searchValue = req.query.searchValue;
+    const page = req.query.page;
+    const skipvalue =(page-1)*10
+
+    const ord = await orders.aggregate([
+      {
+        $match: {orderDeliveriedStatus: false,cancelStatus: false,}
+      },
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      {
+        $match: {
+          "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
+        }
+      },
+      {
+        $count: "totalCount"
+      }
+    ]);
+
+    const orde = await orders.aggregate([
+      {
+        $match: {orderDeliveriedStatus: false,cancelStatus: false,}
+      },
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      {
+        $match: {
+          "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
+        }
+      },
+      { $skip: skipvalue },
+      { $limit: 10 } 
+    ]);
+    if(orde) {
+      res.json({
+        success:true,
+        message:"successfully getted",
+        searchedlength:ord[0]?.totalCount,
+        data:orde,
+      })
+    }
+  }
+  catch(err) {
+    res.json({
+      success:false,
+      message:'getting failed'
+    })
+  }
+}
+
+// get all delivered orders search
+const getsearchdeliveredorder= async(req, res) =>{
+  try {
+    const searchValue = req.query.searchValue;
+    const page = req.query.page;
+    const skipvalue =(page-1)*10
+
+    const ord = await orders.aggregate([
+      {
+        $match: {orderDeliveriedStatus: true}
+      },
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      {
+        $match: {
+          "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
+        }
+      },
+      {
+        $count: "totalCount"
+      }
+    ]);
+
+    const orde = await orders.aggregate([
+      {
+        $match: {orderDeliveriedStatus: true}
+      },
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      {
+        $match: {
+          "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
+        }
+      },
+      { $skip: skipvalue },
+      { $limit: 10 } 
+    ]);
+    if(orde) {
+      res.json({
+        success:true,
+        message:"successfully getted",
+        searchedlength:ord[0]?.totalCount,
+        data:orde,
       })
     }
   }
@@ -549,6 +687,7 @@ module.exports = {
   allcancelorder,
   orderdetail,
   editOrder,
-  getorderlength,
-  getsearchallorder
+  getsearchallorder,
+  getsearchpendingorder,
+  getsearchdeliveredorder
 };

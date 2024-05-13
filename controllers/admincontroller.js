@@ -9,7 +9,7 @@ const addUser= async (req, res) =>{
         const {username , email, phoneNumber} = req.body
         const existingUser= await users.findOne({email})
         if (existingUser) {
-            res.json({
+            res.status(400).json({
                 success:false,
                 message:'user already exists',
             })

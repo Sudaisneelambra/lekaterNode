@@ -135,6 +135,7 @@ const getOrder = async (req, res) => {
           as: "shopdetails",
         },
       },
+      { $sort: { _id: -1 } },
       { $limit: 10 } 
     ]);
     if (order) {
@@ -178,6 +179,8 @@ const getAllOrder = async (req, res) => {
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
+    console.log(orderslength);
+    console.log(order);
     if (order) {
       res.json({
         success: true,
@@ -281,6 +284,9 @@ const allDeliveredOrders = async (req, res) => {
           as: "shopdetails",
         },
       },
+      {
+        $sort: { expectingDeliveryDate: 1 }
+      },
       { $skip: skipvalue },
       { $limit: 10 }
     ]);
@@ -324,8 +330,11 @@ const allPendingOrders = async (req, res) => {
           as: "shopdetails",
         },
       },
-      { $skip: skipvalue },
-      { $limit: 10 } 
+      {
+        $sort: { expectingDeliveryDate: 1 }
+      },
+      // { $skip: skipvalue },
+      // { $limit: 10 } 
     ]);
     console.log(order);
     console.log(order?.length);

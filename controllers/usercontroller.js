@@ -285,7 +285,7 @@ const allDeliveredOrders = async (req, res) => {
         },
       },
       {
-        $sort: { expectingDeliveryDate: 1 }
+        $sort: { DeliveredDate: 1 }
       },
       { $skip: skipvalue },
       { $limit: 10 }

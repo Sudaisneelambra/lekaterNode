@@ -176,6 +176,9 @@ const getAllOrder = async (req, res) => {
           as: "shopdetails",
         },
       },
+      {
+        $sort:{orderReceivedDate:-1}
+      },
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
@@ -333,8 +336,8 @@ const allPendingOrders = async (req, res) => {
       {
         $sort: { expectingDeliveryDate: 1 }
       },
-      // { $skip: skipvalue },
-      // { $limit: 10 } 
+      { $skip: skipvalue },
+      { $limit: 10 } 
     ]);
     console.log(order);
     console.log(order?.length);

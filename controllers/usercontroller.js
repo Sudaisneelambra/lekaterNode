@@ -182,8 +182,6 @@ const getAllOrder = async (req, res) => {
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
-    console.log(orderslength);
-    console.log(order);
     if (order) {
       res.json({
         success: true,
@@ -339,8 +337,6 @@ const allPendingOrders = async (req, res) => {
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
-    console.log(order);
-    console.log(order?.length);
     if (order) {
       res.json({
         success: true,

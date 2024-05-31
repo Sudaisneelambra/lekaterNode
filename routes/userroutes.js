@@ -21,7 +21,7 @@ router.patch('/editOrder',tockencheck,upload.single('imageUrl'),users.editOrder)
 router.get('/getsearchallorder',tockencheck,users.getsearchallorder)
 router.get('/getsearchpendingorder',tockencheck,users.getsearchpendingorder)
 router.get('/getsearchdeliveredorder',tockencheck,users.getsearchdeliveredorder)
-
+router.get('/getsearchbydate',tockencheck,users.getsearchbydate)
 
 
 module.exports=router

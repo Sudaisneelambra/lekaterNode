@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const shopsModel = require("../models/shops");
 const sercretKey = process.env.JWT_SECRETKEY;
 const mongoose = require("mongoose");
+const order = require("../models/order");
 
 
 // user login
@@ -683,6 +684,48 @@ const getsearchdeliveredorder= async(req, res) =>{
   }
 }
 
+const getsearchbydate = async(req, res) =>{
+  try{
+    const searchValue = req.query.searchValue;
+    const searchDate =  new Date(searchValue)
+    console.log(searchDate);
+    console.log(searchValue);
+    // const ord = await orders.find({expectingDeliveryDate:searchValue})
+    const ord = await orders.aggregate([
+      {
+        $match: {expectingDeliveryDate:searchDate}
+      },
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+    ])
+    console.log(ord);
+    if(ord){
+      res.json({
+        success:true,
+        message:"successfully getted",
+        data:ord,
+        })
+    } else {
+      res.json({
+        success:false,
+        message:"no data found"
+        })
+    }
+  }
+  catch(err){
+    res.json({
+      success:false,
+      message:"getting failed"
+      })
+  }
+}
+
 module.exports = {
   userlogin,
   createOrder,
@@ -699,5 +742,6 @@ module.exports = {
   editOrder,
   getsearchallorder,
   getsearchpendingorder,
-  getsearchdeliveredorder
+  getsearchdeliveredorder,
+  getsearchbydate
 };

@@ -532,6 +532,9 @@ const getsearchallorder= async(req, res) =>{
           "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
         }
       },
+      {
+        $sort:{orderReceivedDate:-1}
+      },
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
@@ -693,7 +696,12 @@ const getsearchbydate = async(req, res) =>{
     // const ord = await orders.find({expectingDeliveryDate:searchValue})
     const ord = await orders.aggregate([
       {
-        $match: {expectingDeliveryDate:searchDate}
+        $match: {
+          $and: [
+            { expectingDeliveryDate: searchDate },
+            { orderDeliveriedStatus: false }
+          ]
+        }
       },
       {
         $lookup: {

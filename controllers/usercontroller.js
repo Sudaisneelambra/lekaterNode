@@ -287,7 +287,7 @@ const allDeliveredOrders = async (req, res) => {
         },
       },
       {
-        $sort: { DeliveredDate: 1 }
+        $sort: { DeliveredDate: -1 }
       },
       { $skip: skipvalue },
       { $limit: 10 }
@@ -297,7 +297,7 @@ const allDeliveredOrders = async (req, res) => {
         success: true,
         message: "all delivered order getting successfully",
         data: order,
-        length:orderslength
+        searchedlength:orderslength
       });
     }
   } catch (err) {
@@ -343,7 +343,7 @@ const allPendingOrders = async (req, res) => {
         success: true,
         message: "all pending order getting successfully",
         data: order,
-        length:orderslength
+        searchedlength:orderslength
       });
     }
   } catch (err) {
@@ -538,6 +538,7 @@ const getsearchallorder= async(req, res) =>{
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
+
     if(orde) {
       res.json({
         success:true,
@@ -600,6 +601,9 @@ const getsearchpendingorder= async(req, res) =>{
         $match: {
           "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
         }
+      },
+      {
+        $sort:{expectingDeliveryDate:1}
       },
       { $skip: skipvalue },
       { $limit: 10 } 
@@ -667,6 +671,9 @@ const getsearchdeliveredorder= async(req, res) =>{
           "shopdetails.shopName": { $regex: searchValue, $options: 'i' }
         }
       },
+      {
+        $sort:{DeliveredDate:-1}
+      },
       { $skip: skipvalue },
       { $limit: 10 } 
     ]);
@@ -691,9 +698,10 @@ const getsearchbydate = async(req, res) =>{
   try{
     const searchValue = req.query.searchValue;
     const searchDate =  new Date(searchValue)
+    const page = req.query.page
+    const skipValue =(page-1)*10
     console.log(searchDate);
-    console.log(searchValue);
-    // const ord = await orders.find({expectingDeliveryDate:searchValue})
+    console.log(skipValue);
     const ord = await orders.aggregate([
       {
         $match: {
@@ -711,13 +719,38 @@ const getsearchbydate = async(req, res) =>{
           as: "shopdetails",
         },
       },
+      {
+        $count:'totalCount'
+      }
     ])
-    console.log(ord);
-    if(ord){
+
+    const orde = await orders.aggregate([
+      {
+        $match: {
+          $and: [
+            { expectingDeliveryDate: searchDate },
+            { orderDeliveriedStatus: false }
+          ]
+        }
+      },
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shopName",
+          foreignField: "_id",
+          as: "shopdetails",
+        },
+      },
+      { $skip: skipValue },
+      { $limit: 10 } 
+    ])
+
+    if(orde){
       res.json({
         success:true,
         message:"successfully getted",
-        data:ord,
+        data:orde,
+        searchedlength:ord[0]?.totalCount
         })
     } else {
       res.json({

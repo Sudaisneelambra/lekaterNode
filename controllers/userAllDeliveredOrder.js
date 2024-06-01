@@ -1,16 +1,44 @@
 const orders = require('../models/order')
 
-// get all orders 
-const getAllOrder = async (req, res) => {
+// orderdelivered status change
+const orderdeliveried = async (req, res) => {
     try {
-      const condition = { cancelStatus: false };
+      const id = new mongoose.Types.ObjectId(req.params.id);
+      const singleOrder = await orders.findOne({ _id: id });
+      if (singleOrder) {
+        singleOrder.orderDeliveriedStatus = true;
+        singleOrder.DeliveredDate = new Date();
+        await singleOrder.save();
+        res.json({
+          success: true,
+          message: "order Delivered successfully",
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "order Delivered failed",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({
+        success: false,
+        message: "order deliverying status failed",
+      });
+    }
+  };
+
+  // all deliveried order
+const allDeliveredOrders = async (req, res) => {
+    try {
+      const {page} = req.body
+      const skipvalue =(page-1)*10
+      const condition ={orderDeliveriedStatus: true}
       const orderslength = await orders.countDocuments(condition);
-      const {skip} =req.body
-      const skipvalue =(skip-1)*10
       const order = await orders.aggregate([
         {
           $match: {
-            cancelStatus: { $ne: true },
+            orderDeliveriedStatus: true,
           },
         },
         {
@@ -22,15 +50,15 @@ const getAllOrder = async (req, res) => {
           },
         },
         {
-          $sort:{orderReceivedDate:-1}
+          $sort: { DeliveredDate: -1 }
         },
         { $skip: skipvalue },
-        { $limit: 10 } 
+        { $limit: 10 }
       ]);
       if (order) {
         res.json({
           success: true,
-          message: "order getting successfully",
+          message: "all delivered order getting successfully",
           data: order,
           searchedlength:orderslength
         });
@@ -44,13 +72,17 @@ const getAllOrder = async (req, res) => {
     }
   };
 
-  // get all ordersearch
-const getsearchallorder= async(req, res) =>{
+  // get all delivered orders search
+const getsearchdeliveredorder= async(req, res) =>{
     try {
       const searchValue = req.query.searchValue;
       const page = req.query.page;
       const skipvalue =(page-1)*10
+  
       const ord = await orders.aggregate([
+        {
+          $match: {orderDeliveriedStatus: true}
+        },
         {
           $lookup: {
             from: "shops",
@@ -71,6 +103,9 @@ const getsearchallorder= async(req, res) =>{
   
       const orde = await orders.aggregate([
         {
+          $match: {orderDeliveriedStatus: true}
+        },
+        {
           $lookup: {
             from: "shops",
             localField: "shopName",
@@ -84,12 +119,11 @@ const getsearchallorder= async(req, res) =>{
           }
         },
         {
-          $sort:{orderReceivedDate:-1}
+          $sort:{DeliveredDate:-1}
         },
         { $skip: skipvalue },
         { $limit: 10 } 
       ]);
-  
       if(orde) {
         res.json({
           success:true,
@@ -106,9 +140,10 @@ const getsearchallorder= async(req, res) =>{
       })
     }
   }
-  
+
 
   module.exports = {
-    getAllOrder,
-    getsearchallorder
+    orderdeliveried,
+    allDeliveredOrders,
+    getsearchdeliveredorder
   };

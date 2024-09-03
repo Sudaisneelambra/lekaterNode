@@ -59,7 +59,7 @@ const userlogin = async (req, res) => {
 
 // shops getting for dropdown
 const getShops = async (req, res) => {
-  try {
+  try { 
     const shops = await shopsModel.find({});
     res.json({
       success: true,
@@ -79,6 +79,7 @@ const getShops = async (req, res) => {
 // get orders or latest order
 const getOrder = async (req, res) => {
   try {
+    
     const order = await orders.aggregate([
       {
         $match: {
@@ -215,12 +216,28 @@ const allcancelorder = async (req, res) => {
 const orderdetail = async (req, res) => {
   try {
     const id = new mongoose.Types.ObjectId(req.params.id);
-    const singleOrder = await orders.findOne({ _id: id });
-    if (singleOrder) {
+    // const singleOrder = await orders.findOne({ _id: id });
+    const withShopName= await orders.aggregate([
+      {
+        $match:{
+          _id:id
+        }
+      },
+      {
+        $lookup:{
+          from:"shops",
+          localField:"shopName",
+          foreignField:"_id",
+          as:"shopdetails"
+        }
+      }
+    ])
+    
+    if (withShopName) {
       res.json({
         success: true,
         message: "order details getted successfully",
-        data:singleOrder
+        data:withShopName[0]
       });
     } else {
       res.json({

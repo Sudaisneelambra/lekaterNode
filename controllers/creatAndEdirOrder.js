@@ -2,6 +2,14 @@ const orders = require('../models/order')
 
 // edit order
 const editOrder = async (req, res) => {
+  
+    try{
+      console.log(req.body);
+    }
+     catch(err){
+      console.log(err);
+      
+     }
     try {
       const {
         shopName,

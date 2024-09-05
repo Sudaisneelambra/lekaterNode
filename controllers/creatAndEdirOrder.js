@@ -16,13 +16,17 @@ const editOrder = async (req, res) => {
       const filePath = req?.file?.location;
       const username = req?.tokens?.name;
   
+      console.log(filePath);
+
       const orderdetails = await orders.findOne({_id:orderId})
   
       if( orderdetails) {
         orderdetails.shopName=shopName
         orderdetails.itemName=itemName
         orderdetails.fabricNameAndCode=fabricNameAndCode
-        orderdetails.imageUrl=filePath
+        if(filePath){
+           orderdetails.imageUrl=filePath
+        }
         orderdetails.itemDescription=itemDescription
         orderdetails.orderReceivedDate=orderReceivedDate
         orderdetails.expectingDeliveryDate=expectingDeliveryDate
@@ -59,8 +63,8 @@ const createOrder = async (req, res) => {
       } = req.body;
   
       const filePath = req?.file?.location;
-      const username = req?.tokens?.name;
-  
+      const username = req?.tokens?.name;   
+
       const neworder = new orders({
         shopName,
         itemName,

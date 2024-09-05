@@ -16,7 +16,7 @@ const editOrder = async (req, res) => {
       const filePath = req?.file?.location;
       const username = req?.tokens?.name;
   
-      console.log(filePath);
+      console.log(filePath,'-----------');
 
       const orderdetails = await orders.findOne({_id:orderId})
   

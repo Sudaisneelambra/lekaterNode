@@ -2,6 +2,8 @@
 
   const checkTocken=(req, res, next)=>{
     try{
+        console.log('frefrefrefrefr');
+        
         const secretKey= process.env.JWT_SECRETKEY;
         const authorizationHeader = req.headers['authorization'];
         

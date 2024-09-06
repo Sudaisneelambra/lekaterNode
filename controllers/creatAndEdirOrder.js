@@ -14,6 +14,8 @@ const editOrder = async (req, res) => {
         orderId
       } = req.body;
   
+      console.log(req.body);
+      
       const filePath = req?.file?.location;
       const username = req?.tokens?.name;
   

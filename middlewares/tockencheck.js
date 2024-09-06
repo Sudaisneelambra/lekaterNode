@@ -24,6 +24,7 @@
                 console.log('Authorization header has expired');
               } else {
                 req.tokens= decoded;
+                console.log('from token');
                 
                 next();
               }

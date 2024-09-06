@@ -30,7 +30,7 @@ router.get('/getsearchbydate',tockencheck,userPendingOrder.getsearchbydate)
 router.get('/getsearchpendingorder',tockencheck,userPendingOrder.getsearchpendingorder)
 
 // edit and create order
-router.post('/editOrder',(req,res,next)=>{console.log('anux'); next()},tockencheck,upload.single('imageUrl'),editAndcreate.editOrder)
+router.post('/editOrder',tockencheck,upload.single('imageUrl'),editAndcreate.editOrder)
 router.post('/createOrder',tockencheck,upload.single('imageUrl'),editAndcreate.createOrder)
 
 

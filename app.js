@@ -11,7 +11,8 @@ app.use(cors(
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   }
 ));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 const userRoutes = require('./routes/userroutes')
 const adminRoutes =require('./routes/adminroutes')

@@ -5,7 +5,12 @@ const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3000;
 const DB_URL = process.env.DB_URL;
 const app = express();
-app.use(cors());
+app.use(cors(
+  {
+    origin: 'https://stylofe.lokamaflying.xyz', // Add your frontend URL here
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  }
+));
 app.use(express.json());
 
 const userRoutes = require('./routes/userroutes')
